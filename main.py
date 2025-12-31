@@ -46,3 +46,22 @@ def callback(request: Request):
     token_json = token_response.json()
 
     return {"token_info": token_json, "realm_id": realm_id}
+
+# query helper
+def quickbooks_query(access_token: str, realm_id: str, query: str):
+    url = f"{API_BASE_URL}/v3/company/{realm_id}/query"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/json",
+    }
+    response = requests.get(url, headers=headers, params={"query": query})
+    if response.status_code == 200:
+        return response.json().get("QueryResponse", {})
+    else:
+        return {"error": response.status_code, "message": response.text}
+
+# endpoints
+@app.get("/customers")
+def get_customers(access_token: str, realm_id: str):
+    query = "SELECT Id, DisplayName, PrimaryEmailAddr FROM Customer"
+    return quickbooks_query(access_token, realm_id, query)
