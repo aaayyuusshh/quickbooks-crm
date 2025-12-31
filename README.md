@@ -4,13 +4,41 @@ A super minimal Python FastAPI REST API that integrates with QuickBooks using `O
 
 I built this just for fun and to demonstrate real-world API integration, authentication flows, and backend proficiency.
 
-## Authentication Flow (OAuth 2.0)
+## OAuth 2.0 Authentication Flow
 
-* User hits `/login`
-* Redirected to Intuit login & consent screen
-* Intuit redirects back to `/callback`
-* Authorization code is exchanged for an access token
-* Access token is used to call QuickBooks APIs
+```mermaid
+sequenceDiagram
+    participant User
+    participant Backend as FastAPI Backend
+    participant Intuit as QuickBooks OAuth Server
+
+    User->>Backend: GET /login
+    Backend->>Intuit: Redirect to Intuit Auth URL
+    User->>Intuit: Login & Grant Consent
+    Intuit->>Backend: Redirect to /callback?code=AUTH_CODE&realmId=REALM_ID
+    Backend->>Intuit: Exchange code for access token
+    Intuit->>Backend: access_token + refresh_token
+    Backend->>User: Tokens returned (JSON)
+```
+
+## API Data Fetch Flow (Customers / Invoices / Payments / Accounts)
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Backend as FastAPI Backend
+    participant QBO as QuickBooks API
+
+    Client->>Backend: GET /customers (access_token, realm_id)
+    Backend->>QBO: Query Customer data
+    QBO->>Backend: JSON response
+    Backend->>Client: Customers JSON
+
+    Client->>Backend: GET /invoices
+    Backend->>QBO: Query Invoice data
+    QBO->>Backend: JSON response
+    Backend->>Client: Invoices JSON
+```
 
 ## API Endpoints
 
@@ -35,7 +63,7 @@ Handles the OAuth redirect from Intuit and exchanges authorization code for OAut
 }
 ```
 
-_Endpoints below require these **two** query parameters that are retrieved upon logging in and authenticing as shown above:_
+_Endpoints below require these **two** query parameters that are retrieved upon logging in and authenticating as shown above:_
 * ``access_token``
 * ``realm_id``
 
@@ -194,4 +222,3 @@ Returns internal financial accounts such as bank accounts, revenue, and expenses
 * Tokens are returned directly for simplicity (not production-safe)
 * No pagination or filtering implemented yet
 * Aimed for quick learning (pun intended hahah)
-
