@@ -65,3 +65,8 @@ def quickbooks_query(access_token: str, realm_id: str, query: str):
 def get_customers(access_token: str, realm_id: str):
     query = "SELECT Id, DisplayName, PrimaryEmailAddr FROM Customer"
     return quickbooks_query(access_token, realm_id, query)
+
+@app.get("/invoices")
+def get_invoices(access_token: str, realm_id: str):
+    query = "SELECT Id, DocNumber, CustomerRef, TotalAmt, Balance, TxnDate FROM Invoice"
+    return quickbooks_query(access_token, realm_id, query)
