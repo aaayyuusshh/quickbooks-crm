@@ -71,8 +71,12 @@ def get_invoices(access_token: str, realm_id: str):
     query = "SELECT Id, DocNumber, CustomerRef, TotalAmt, Balance, TxnDate FROM Invoice"
     return quickbooks_query(access_token, realm_id, query)
 
-
 @app.get("/payments")
 def get_payments(access_token: str, realm_id: str):
     query = "SELECT Id, CustomerRef, TotalAmt, PaymentRefNum, TxnDate FROM Payment"
+    return quickbooks_query(access_token, realm_id, query)
+
+@app.get("/accounts")
+def get_accounts(access_token: str, realm_id: str):
+    query = "SELECT Id, Name, AccountType, AccountSubType, CurrentBalance FROM Account"
     return quickbooks_query(access_token, realm_id, query)
